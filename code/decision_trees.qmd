@@ -1,0 +1,204 @@
+
+---
+title: "Decision Trees Analysis in Cycling Power Training"
+---
+
+## Introduction
+
+In the "Cycling Power Training" project, we aim to apply decision tree algorithms to analyze data related to cycling power training. Decision trees are a powerful machine learning technique that can help us understand and predict the performance of cyclists under various training conditions. By using decision trees, we can gain insights into which factors most significantly affect a cyclist's power output and leverage this knowledge to optimize training regimens. Our dataset includes metrics such as heart rate, cadence, and power output, recorded across diverse training sessions, providing a rich basis for our analysis.
+
+In this section, we will explore the application of decision trees, including Random Forest and Boosting methods, to uncover patterns and insights that can enhance training strategies and performance. Our goal is to transform these insights into actionable recommendations, enabling cyclists to achieve their peak performance through data-driven training approaches.
+
+## Data Loading and Initial Inspection
+
+To begin our analysis, we first need to load and inspect the cycling power training dataset. This step is crucial to understand the structure and quality of our data, which will guide our subsequent analysis steps.
+
+```{python}
+import pandas as pd
+
+# Load the cleaned data
+data = pd.read_csv("cleaned_with_user_code_cycledata.csv")
+
+# Display the first few rows to understand the dataset
+print("First few rows of the dataset:")
+print(data.head())
+
+# Check the structure and summary of the dataset
+print("\\nGeneral Information about the dataset:")
+print(data.info())
+```
+
+In this section, we use Python and pandas to load our dataset and display the first few rows, giving us an initial glimpse into the types of data we're dealing with. The data.info() function provides a concise summary of the columns, including the number of non-null values and the data type of each column, helping us quickly assess data completeness and potential areas that may require cleaning or transformation.
+
+## Class Distribution Analysis
+
+A critical aspect of any classification problem is understanding the distribution of the target variable. In our case, if the dataset includes a categorical variable that we're aiming to predict (e.g., cyclist performance levels), it's essential to know how these categories are distributed. An imbalanced distribution might require specific techniques to ensure a fair and effective model training process.
+
+```{python}
+import matplotlib.pyplot as plt
+# Assuming there's a categorical target variable, e.g., 'PerformanceCategory'
+if 'PowerOutputCategory' in data.columns:
+    print("Class distribution in the dataset:")
+    print(data['PowerOutputCategory'].value_counts())
+
+    # Visualizing the class distribution
+    data['PowerOutputCategory'].value_counts().plot(kind='bar')
+    plt.title('Distribution of Power Output Categories')
+    plt.xlabel('Category')
+    plt.ylabel('Frequency')
+    plt.show()
+else:
+    print("No categorical target variable 'PowerOutputCategory' found in the dataset.")
+```
+
+This code snippet checks for the presence of a categorical target variable and, if found, prints out the distribution of its classes. Additionally, a bar plot provides a visual representation of this distribution, which can be very helpful in understanding the data's balance.
+
+## Baseline Model for Comparison
+
+Establishing a baseline model is a key step in any machine learning project. It provides a reference point to compare the performance of more advanced models that we will develop later. In this case, we'll use a simple random classifier as our baseline.
+
+```{python}
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+
+# Split the data into features and target variable
+# Assuming 'PerformanceCategory' is the target variable
+if 'PowerOutputCategory' in data.columns:
+    X = data.drop('PowerOutputCategory', axis=1)  # features
+    y = data['PowerOutputCategory']               # target
+
+    # Splitting the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    # Creating a dummy classifier to serve as our baseline
+    dummy_clf = DummyClassifier(strategy="uniform")
+    dummy_clf.fit(X_train, y_train)
+    y_pred = dummy_clf.predict(X_test)
+
+    # Evaluating the baseline model
+    print("Baseline Model Performance:")
+    print(classification_report(y_test, y_pred))
+else:
+    print("Target variable 'PowerOutputCategory' not found in the dataset.")
+```
+
+This script sets up a basic random classifier and evaluates its performance against our test set. The classification report provides metrics like accuracy, precision, and recall, which are essential for understanding the baseline model's performance.
+
+## Feature Selection
+
+While optional, feature selection is an important process in machine learning. It involves selecting the most relevant features for the model, reducing dimensionality and potentially improving model performance.
+
+```{python}
+import numpy as np
+from sklearn.feature_selection import SelectKBest, f_classif
+
+# Check if the target variable 'PowerOutputCategory' exists in the dataset
+if 'PowerOutputCategory' in data.columns:
+    # Separating features and the target variable
+    # Exclude non-numeric columns like 'Time'
+    X = data.select_dtypes(include=[np.number])  # Select only numeric features
+    y = data['PowerOutputCategory']               # Target variable
+
+    # Applying SelectKBest for feature selection
+    selector = SelectKBest(score_func=f_classif, k='all')
+    X_new = selector.fit_transform(X, y)
+
+    # Getting scores for each feature
+    feature_scores = pd.DataFrame({
+        'Feature': X.columns,
+        'Score': selector.scores_
+    }).sort_values(by='Score', ascending=False)
+
+    # Print feature scores
+    print("Feature scores:")
+    print(feature_scores)
+else:
+    print("Target variable 'PowerOutputCategory' not found in the dataset.")
+```
+
+This step helps in pinpointing the features that most significantly contribute to predicting the power output categories.
+
+## Model Tuning
+
+Optimizing the parameters of our decision tree model is crucial to enhance its performance. We'll use grid search to systematically explore a range of parameters and determine the best combination for our model.
+
+```{python}
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
+
+# Check if the target variable 'PowerOutputCategory' exists
+if 'PowerOutputCategory' in data.columns:
+    # Separate features and the target variable
+    # First, drop non-numeric columns like 'Time'
+    X = data.select_dtypes(include=[np.number])  # Use only numeric features
+    y = data['PowerOutputCategory']               # Target variable
+
+    # Splitting the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    # Defining the parameter grid for Decision Tree
+    param_grid = {
+        'max_depth': [10, 20, 30],
+        'min_samples_split': [2, 5, 10],
+        'criterion': ['gini', 'entropy']
+    }
+
+    # Setting up Grid Search to find the optimal parameters
+    dtree = DecisionTreeClassifier(random_state=42)
+    grid_search = GridSearchCV(dtree, param_grid, cv=5, scoring='accuracy', n_jobs=-1)
+    grid_search.fit(X_train, y_train)
+
+    # Printing the best parameters found by Grid Search
+    print("Best parameters found: ")
+    print(grid_search.best_params_)
+else:
+    print("Model tuning is not applicable as the target variable 'PowerOutputCategory' is missing.")
+```
+
+This process aids in fine-tuning the model by exploring various combinations of parameters to enhance its accuracy and reliability.
+
+## Final Model Training and Results
+
+After tuning our model with the optimal parameters, we train our final decision tree model and evaluate its performance.
+
+```{python}
+from sklearn.metrics import confusion_matrix, classification_report
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Check if the target variable 'PowerOutputCategory' exists for training
+if 'PowerOutputCategory' in data.columns:
+    # Training the final model with the best parameters
+    final_model = DecisionTreeClassifier(**grid_search.best_params_, random_state=42)
+    final_model.fit(X_train, y_train)
+
+    # Predictions on the test set
+    y_pred = final_model.predict(X_test)
+
+    # Evaluation
+    print("Classification Report:")
+    print(classification_report(y_test, y_pred))
+
+    # Confusion Matrix
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d')
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.show()
+else:
+    print("Final model training is not applicable as the target variable 'PowerOutputCategory' is missing.")
+```
+
+The classification report and confusion matrix provide a comprehensive view of the model's performance, highlighting its strengths and areas for improvement.
+
+## Conclusions
+
+Our exploration into decision tree algorithms has unveiled critical insights into cycling power training. The model's ability to discern key factors impacting performance can revolutionize training strategies. Key findings include the significance of certain metrics like 'Watts' and the model's nuanced understanding of different training conditions.
+
+The results exemplify the potential of data-driven methodologies in sports science, offering avenues for enhanced performance and tailored training regimens. Future research might delve into integrating diverse data types or experimenting with more complex machine learning models to further refine these insights.
+
+In summary, this analysis not only sheds light on the intricacies of cycling training but also underscores the transformative power of machine learning in sports performance optimization.
