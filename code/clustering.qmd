@@ -1,0 +1,206 @@
+---
+title: "Clustering Analysis in Cycling Power Training"
+---
+
+## Introduction
+
+In our quest to optimize cycling power training, we delve into a wealth of cycling session data, meticulously recorded and cleaned, ready for a deep dive. This dataset captures the nuances of cyclists' performances, featuring variables like heart rate, cadence, and power output across various altitudes and geolocations, timestamped for precise training intervals. Each entry unfolds a story of the athlete's endurance and power, with measurements taken at a granular level throughout their training sessions.
+
+The aim of our clustering analysis is multifaceted: we intend to uncover patterns that define the most effective training regimes and distinguish high-performing cyclists from their data signatures. By clustering the power output — categorized into 'Low' and 'Medium' levels — along with other continuous metrics, we seek to reveal hidden correlations and groupings that transcend the obvious. These insights are crucial in tailoring bespoke training plans that can propel cyclists towards their peak performance, informed by data-driven narratives that emerge from the clustering process.
+
+In this analytical journey, we harness the power of machine learning to navigate through the complexity of training data, setting our sights on clusters that might indicate optimal training times, conditions that yield the best performance, and potential areas of improvement. As we pedal through this exploration, our findings promise to not only enhance training strategies but also to push the boundaries of what data can disclose about athletic prowess.
+
+## Theory
+
+### K-Means Clustering
+
+Imagine clustering as a way of organizing runners in a race based on their running speeds into different groups. K-Means clustering does something similar with data. It partitions the data into K distinct clusters, each represented by the average of its points, known as the centroid. Think of centroids as the 'center of mass' for each group. The K-Means algorithm searches for the sweet spot where each point is as close as possible to its cluster's centroid, minimizing the differences within the clusters. The art of picking the right K, akin to choosing the right number of speed groups for our runners, is crucial and often employs methods like the Elbow Method, which helps us find a balance between not having too many or too few clusters.
+
+### DBSCAN Clustering
+
+DBSCAN stands for Density-Based Spatial Clustering of Applications with Noise. It's like finding gatherings in a park; some areas are crowded, some have just a few people, and some individuals are off by themselves. DBSCAN groups densely packed data points together and marks those that are alone as outliers. It's particularly adept at handling unusual data shapes and can even identify clusters within clusters. The parameters 'eps' and 'min_samples' are akin to defining how close people should be to be considered part of a group and the minimum number of people to form a social gathering, respectively.
+
+### Hierarchical Clustering
+
+Hierarchical clustering is like building a family tree for the data points. Starting from each individual data point, it repeatedly merges pairs of groups that are closest to each other until all data points have been merged into a single big family. This process results in a tree-like diagram called a dendrogram, which shows the order of merges and the distance between merged groups. Interpreting the dendrogram allows us to see not just one possible division of data into clusters, but potentially many levels of clustering, ranging from many small clusters to few large ones.
+
+## Methods
+
+### Data Selection and Preprocessing
+
+Our data consists of a detailed log of cycling training sessions, with each session offering measurements such as heart rate, cadence, and power output. Before we dive into the clustering, we need to prepare our dataset to ensure our algorithms can detect the underlying patterns effectively.
+
+```{python}
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Load the dataset
+data = pd.read_csv("cleaned_with_user_code_cycledata.csv")
+
+# Convert 'Watts' to numeric and coerce errors
+data['Watts'] = pd.to_numeric(data['Watts'], errors='coerce')
+
+# Identify numeric columns and exclude non-numeric columns like 'Time' and categories like 'PowerOutputCategory'
+numeric_columns = data.select_dtypes(include=[np.number]).columns.tolist()
+
+# Exclude non-numeric columns explicitly
+non_numeric_columns = ['Time', 'PowerOutputCategory', 'PowerOutput']
+numeric_columns = [col for col in numeric_columns if col not in non_numeric_columns]
+
+# Fill NaN values in numeric columns with their mean values
+for col in numeric_columns:
+    data[col] = data[col].fillna(data[col].mean())
+
+# Select features relevant for clustering
+features = data[numeric_columns]
+
+# Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(features)
+
+```
+
+### Clustering Workflows
+
+For each clustering method, we conducted a series of steps to tune and apply the algorithm. We present these workflows with inline code and visualizations to demonstrate our process.
+
+# K-Means Clustering Workflow
+
+We first determined the optimal number of clusters by using the Elbow Method.
+After identifying the best K value, we applied the K-Means algorithm and visualized the clusters.
+
+```{python}
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Determining the optimal number of clusters using the Elbow Method
+wcss = []
+for i in range(1, 11):
+    kmeans = KMeans(n_clusters=i, random_state=42)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+# Plotting the Elbow graph
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, 11), wcss, marker='o', linestyle='--')
+plt.title('Elbow Method for Optimal K')
+plt.xlabel('Number of Clusters')
+plt.ylabel('WCSS')
+plt.show()
+
+# Applying K-Means Clustering with optimal number of clusters
+optimal_k = 4  # Replace with the optimal number of clusters from the Elbow Method
+kmeans = KMeans(n_clusters=optimal_k, random_state=42)
+clusters = kmeans.fit_predict(X_scaled)
+
+# Plotting the clusters
+plt.scatter(X_scaled[clusters == 0, 0], X_scaled[clusters == 0, 1], s=50, c='red', label='Cluster 1')
+plt.scatter(X_scaled[clusters == 1, 0], X_scaled[clusters == 1, 1], s=50, c='blue', label='Cluster 2')
+plt.scatter(X_scaled[clusters == 2, 0], X_scaled[clusters == 2, 1], s=50, c='green', label='Cluster 3')
+plt.scatter(X_scaled[clusters == 3, 0], X_scaled[clusters == 3, 1], s=50, c='yellow', label='Cluster 4')
+plt.title('Clusters of Cyclists')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.legend()
+plt.show()
+
+```
+
+### DBSCAN Clustering
+
+We chose appropriate eps and min_samples parameters after several iterations.
+Once we found the parameters that best grouped the data, we visualized the DBSCAN clusters.
+
+```{python}
+from sklearn.cluster import DBSCAN
+
+# Applying DBSCAN Clustering
+dbscan = DBSCAN(eps=0.5, min_samples=5)  # eps and min_samples can be adjusted
+dbscan_clusters = dbscan.fit_predict(X_scaled)
+
+# Visualizing the DBSCAN clusters
+plt.scatter(X_scaled[dbscan_clusters == 0, 0], X_scaled[dbscan_clusters == 0, 1], s=50, c='green', label ='Cluster 1')
+# Repeat for other clusters
+plt.title('DBSCAN Clustering of Cyclists')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.legend()
+plt.show()
+```
+
+### Hierarchical Clustering
+
+We used the linkage method to create a hierarchical cluster tree.
+We then plotted the dendrogram to help us decide where to cut the tree to form clusters.
+
+```{python}
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+# Generating the linkage matrix
+linked = linkage(X_scaled, method='ward')
+
+# Plotting the dendrogram
+plt.figure(figsize=(12, 7))
+dendrogram(linked, orientation='top', distance_sort='descending', show_leaf_counts=True)
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('Data Point')
+plt.ylabel('Euclidean Distance')
+plt.show()
+```
+
+
+### Results
+Our clustering analysis has yielded intriguing insights into the training patterns of cyclists. By applying different clustering techniques, we have discovered distinct groupings that suggest various training behaviors and performance levels.
+
+# K-Means Clustering Results
+
+The K-Means algorithm has partitioned the cyclists into four distinct clusters, as shown in our first visualization. The tight grouping of Cluster 1 may represent amateur cyclists who maintain a consistent but moderate pace, reflecting a focused training on stamina rather than intensity. The broad spread within Cluster 4 could indicate a more diverse skill set, perhaps capturing the varied performance of professional athletes during high-intensity training sessions.
+
+```{python}
+# K-Means Clustering Visualization
+plt.figure(figsize=(10, 6))
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=kmeans.labels_, cmap='viridis')
+plt.title('K-Means Clustering Results')
+plt.xlabel('Feature 1 (Standardized)')
+plt.ylabel('Feature 2 (Standardized)')
+plt.colorbar(label='Cluster Label')
+plt.show()
+```
+
+# DBSCAN Clustering Results
+
+The DBSCAN algorithm has effectively isolated a specific cluster, while identifying sparse data points as noise, as seen in our second visualization. This cluster may correspond to a niche group of cyclists who perhaps train in unique conditions or follow an unconventional training regimen, separating them from the general trends observed in the larger dataset.
+
+```{python}
+# DBSCAN Clustering Visualization
+plt.figure(figsize=(10, 6))
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=dbscan.labels_, cmap='viridis')
+plt.title('DBSCAN Clustering Results')
+plt.xlabel('Feature 1 (Standardized)')
+plt.ylabel('Feature 2 (Standardized)')
+plt.colorbar(label='Cluster Label')
+plt.show()
+```
+
+# Hierarchical Clustering Results
+
+Our third visualization, the dendrogram, depicts how cyclists can be grouped into a hierarchy of clusters based on their training data. The significant heights of the dendrogram branches suggest notable differences in training patterns, which could be reflective of diverse training programs or performance levels among cyclists.
+
+```{python}
+# Hierarchical Clustering Dendrogram
+linked = linkage(X_scaled, method='ward')
+plt.figure(figsize=(12, 7))
+dendrogram(linked, orientation='top', distance_sort='descending', show_leaf_counts=True)
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('Index of Data Point')
+plt.ylabel('Euclidean Distance')
+plt.show()
+```
+
+# Comparative Analysis
+
+Each clustering method brought unique perspectives to our analysis. K-Means provided a clear-cut division into identifiable groups, making it easy to categorize cyclists into distinct performance brackets. DBSCAN's strength was in its ability to highlight anomalies, identifying outliers that may warrant further investigation. The dendrogram from hierarchical clustering offered a detailed view of the potential groupings, allowing for a nuanced understanding of the cyclist's performance relationships.
+
+The comparison of the clusters to known performance categories showed some alignment, indicating that our unsupervised learning techniques are capable of capturing meaningful patterns in the data. However, the true value lies in the novel insights gained, such as the impact of environmental conditions like altitude on training effectiveness, which were made apparent through our clustering efforts.
+

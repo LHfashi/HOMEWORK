@@ -1,0 +1,42 @@
+---
+title: "Introduction to Cycling Power Training"
+---
+
+The rapidly evolving domain of competitive cycling has experienced an intriguing shift in its training methodologies, pivoting from intuition-based strategies to a data-centric paradigm. The epicenter of this transformation is the advent of cycling power training, where real-time power output metrics are integrated into training regimens, offering cyclists a nuanced insight into their performance.
+
+## Seminal Academic Insights
+
+In their comprehensive review, **Faria, Parker, & Faria** elucidated the multifaceted science underpinning cycling[^1]. They ventured deep into the physiology of cycling, marrying traditional training practices with modern scientific methodologies. Their findings underline the significance of power metrics, advocating for their adoption to realize enhanced performance outcomes.
+
+On a tangentially innovative frontier, **Kassim & Said** amalgamated the realms of interactive indoor cycling exercises with the immersive domain of virtual reality video games[^2]. Their explorations revealed that such a fusion not only amplifies engagement but, when fortified with data analytics, can drastically enhance the efficacy of indoor cycling sessions.
+
+## Why Delve into Cycling Power Training?
+
+Cycling, at its core, is a symphony of human physiology and mechanical prowess. Power training introduces a third dimension – data. With real-time metrics, cyclists can adapt their strategies, optimizing performance in tandem with physiological responses. Beyond mere numbers, as Kassim & Said illustrated, the incorporation of immersive technologies offers an unprecedented engagement level, further enhancing training outcomes[^2].
+
+## Contrasting Perspectives and Our Exploration
+
+Historically, the emphasis was predominantly on training volume and perceived exertion. However, luminaries like Faria et al. have heralded a new era, one where quantitative metrics hold the reins[^1]. Yet, the landscape is vast and varied. While some researchers delve into the raw power metrics, others, like Kassim & Said, venture into the technological confluence, emphasizing experience and engagement[^2].
+
+As we embark on this journey, we aim to:
+- Dissect the nuanced relationship between power metrics and performance.
+- Unravel the potential of technology, especially VR, in reshaping power training.
+- Synthesize traditional and modern training methodologies for holistic training paradigms.
+
+## Research Questions
+
+1. How pivotal is power training in modern competitive cycling?
+2. What physiological changes underpin the benefits of power training?
+3. Can the immersive nature of VR significantly bolster power training outcomes?
+4. How do real-time power metrics correlate with race performance?
+5. Are there thresholds in power outputs, signifying overtraining or fatigue?
+6. How do external variables, like altitude and temperature, affect power metrics?
+7. How have technological advancements, like VR, reshaped indoor power training regimens?
+8. Can a synergy of qualitative and quantitative metrics offer a comprehensive training strategy?
+9. How might dietary and recovery routines intersect with power metrics?
+10. Gazing into the future, how will evolving tech further redefine power training?
+
+This introduction is but a primer into the vast expanse of cycling power training. As we progress, our explorations will deepen, our strategies refined, and our understanding augmented.
+
+[^1]: Faria, E. W., Parker, D. L., & Faria, I. E. (2005). The science of cycling: physiology and training—part 1. Sports medicine, 35, 285-312.
+[^2]: Kassim, M., & Said, M. N. H. M. (2018). Data analytics on interactive indoor cycling exercises with virtual reality video games. In 2018 4th International Conference on Control, Automation and Robotics (ICCAR) (pp. 321-326). IEEE.

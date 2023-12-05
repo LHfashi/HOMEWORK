@@ -1,0 +1,162 @@
+
+---
+title: "Exploratory Data Analysis for Cycling Power Training"
+---
+
+## Introduction
+
+Exploratory Data Analysis (EDA) provides a deeper understanding of the data, helping to uncover patterns, anomalies, and potential insights. In this section, we'll explore the dataset related to cycling power training to better understand the relationships between various metrics.
+
+## Data Source
+
+The data used in this analysis is sourced from cleaned datasets based on:
+
+1. [Training Characteristics and Power Profiles of USA Cycling Road Cyclists](https://trace.tennessee.edu/cgi/viewcontent.cgi?article=3324&context=utk_gradthes)
+2. [Training Characteristics of Male and Female Professional Road Cyclists](https://www.researchgate.net/publication/333440524_Training_Characteristics_of_Male_and_Female_Professional_Road_Cyclists)
+3. [A Giant Study on Power Records in 144 Professional Cyclists](https://www.wattkg.com/a-giant-study-on-power-records-in-144-professional-cyclists/)
+
+## Data Understanding
+
+We begin our EDA by understanding the dataset. The data has been sourced from multiple studies, as mentioned above, and represents metrics related to cycling power training.
+
+To get an initial grasp, let's glance over the first few rows of the data.
+
+```{python}
+import pandas as pd
+data = pd.read_csv("cleaned_with_user_code_cycledata.csv")
+data.head()
+```
+
+Next, let's explore the descriptive statistics of the dataset.
+
+```{python}
+data.describe()
+```
+
+## Data Visualization
+
+Visualizations play a crucial role in understanding the data. They help in identifying patterns, anomalies, and relationships among the data.
+
+### Histograms
+
+Histograms help understand the distribution of a particular variable in the dataset.
+
+```{python}
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Histogram for AltitudeMeters
+plt.figure(figsize=(14, 8))
+sns.histplot(data['AltitudeMeters'], bins=30, kde=True, color='blue')
+plt.title('Distribution of Altitude Meters')
+plt.xlabel('Altitude Meters')
+plt.ylabel('Frequency')
+plt.show()
+
+# Histogram for HeartRate
+plt.figure(figsize=(14, 8))
+sns.histplot(data['HeartRate'], bins=30, kde=True, color='green')
+plt.title('Distribution of Heart Rate')
+plt.xlabel('Heart Rate (bpm)')
+plt.ylabel('Frequency')
+plt.show()
+
+# Histogram for Cadence
+plt.figure(figsize=(14, 8))
+sns.histplot(data['Cadence'], bins=30, kde=True, color='red')
+plt.title('Distribution of Cadence')
+plt.xlabel('Cadence (rpm)')
+plt.ylabel('Frequency')
+plt.show()
+
+# Histogram for Watts
+plt.figure(figsize=(14, 8))
+sns.histplot(data['Watts'], bins=30, kde=True, color='purple')
+plt.title('Distribution of Power Output (Watts)')
+plt.xlabel('Power Output (Watts)')
+plt.ylabel('Frequency')
+plt.show()
+```
+
+### Scatter Plots
+
+Scatter plots assist in visualizing the relationship between two variables.
+
+```{python}
+# Scatter plot for HeartRate vs. Watts
+plt.figure(figsize=(14, 8))
+sns.scatterplot(data=data, x='HeartRate', y='Watts', alpha=0.6, color='blue')
+plt.title('Heart Rate vs. Power Output')
+plt.xlabel('Heart Rate (bpm)')
+plt.ylabel('Power Output (Watts)')
+plt.show()
+
+# Scatter plot for Cadence vs. Watts
+plt.figure(figsize=(14, 8))
+sns.scatterplot(data=data, x='Cadence', y='Watts', alpha=0.6, color='green')
+plt.title('Cadence vs. Power Output')
+plt.xlabel('Cadence (rpm)')
+plt.ylabel('Power Output (Watts)')
+plt.show()
+```
+
+## Correlation Analysis
+
+Understanding the correlation between different variables is pivotal as it informs about the linear relationship between them.
+
+```{python}
+correlation_matrix = data[['HeartRate', 'Cadence', 'Watts', 'AltitudeMeters']].corr()
+plt.figure(figsize=(12, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation Matrix')
+plt.show()
+```
+
+## Identifying Outliers
+Outliers can be anomalies or genuine extreme values. Let's identify potential outliers using boxplots.
+```{python}
+# Boxplot for AltitudeMeters
+plt.figure(figsize=(14, 8))
+sns.boxplot(data['AltitudeMeters'])
+plt.title('Boxplot for Altitude Meters')
+plt.show()
+
+# Boxplot for HeartRate
+plt.figure(figsize=(14, 8))
+sns.boxplot(data['HeartRate'])
+plt.title('Boxplot for Heart Rate')
+plt.show()
+
+# Boxplot for Cadence
+plt.figure(figsize=(14, 8))
+sns.boxplot(data['Cadence'])
+plt.title('Boxplot for Cadence')
+plt.show()
+
+# Boxplot for Watts
+plt.figure(figsize=(14, 8))
+sns.boxplot(data['Watts'])
+plt.title('Boxplot for Power Output (Watts)')
+plt.show()
+```
+
+## Hypothesis Generation
+
+Based on the visualizations and data understanding:
+
+1. Cyclists tend to have higher power outputs at certain heart rate ranges. This could mean that there's an optimal heart rate range for maximum power output.
+2. Altitude might affect a cyclist's performance, as indicated by the bimodal distribution.
+
+## Insights from EDA
+
+From our preliminary EDA, the following insights emerge:
+
+1. **Altitude Distribution**: The altitude distribution is bimodal, indicating two significant altitudes where most of the cycling activity is taking place.
+2. **Heart Rate Distribution**: Most of the heart rate values are concentrated between 150-175 bpm.
+3. **Cadence Distribution**: There's a significant peak in cadence values around 70-90 rpm, indicating a preferred cadence range for most cyclists.
+4. **Power Output Distribution**: The power output has a slight peak around 250-275 Watts.
+5. **Correlations**: 
+    - There exists a moderate positive correlation between HeartRate and Watts. As the heart rate increases, the power output also seems to increase.
+    - Cadence and Watts have a weaker positive correlation.
+
+These insights serve as a foundation for more in-depth analysis and hypothesis testing in subsequent phases of the project.

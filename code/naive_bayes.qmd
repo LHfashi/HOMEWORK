@@ -1,0 +1,222 @@
+---
+title: "Cycling Power Training Analysis"
+---
+
+## Exploratory Data Analysis
+
+### Data Understanding
+
+The dataset represents metrics related to cycling power training. The data has been sourced from studies focusing on the relationship between various physical metrics and their impact on cycling performance. Each row in the dataset represents a unique cycling session for an individual.
+
+Features in the dataset:
+- **HeartRate**: Represents the heart rate of the cyclist in beats per minute (bpm). It's a numerical feature.
+- **Cadence**: Represents the pedaling rate of the cyclist in revolutions per minute (rpm). It's a numerical feature.
+- **Watts**: Represents the power output of the cyclist in watts. It's a numerical feature indicating the energy exerted during the cycling session.
+- **AltitudeMeters**: Represents the altitude at which the cycling activity took place, measured in meters. It's a numerical feature.
+
+### Descriptive Statistics
+
+Before diving into visualizations, let's understand the basic statistics of our dataset.
+
+
+```{python}
+import pandas as pd
+data = pd.read_csv("cleaned_with_user_code_cycledata.csv")
+data.describe()
+```
+
+### Visualizations
+
+Visualizations are essential for understanding the distribution and relationships in the dataset.
+
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# HeartRate Distribution
+sns.histplot(data['HeartRate'], bins=30, kde=True)
+plt.title('HeartRate Distribution')
+plt.xlabel('HeartRate (bpm)')
+plt.ylabel('Frequency')
+plt.show()
+
+# Cadence Distribution
+sns.histplot(data['Cadence'], bins=30, kde=True)
+plt.title('Cadence Distribution')
+plt.xlabel('Cadence (rpm)')
+plt.ylabel('Frequency')
+plt.show()
+
+# Watts Distribution
+sns.histplot(data['Watts'], bins=30, kde=True)
+plt.title('Watts Distribution')
+plt.xlabel('Watts (w)')
+plt.ylabel('Frequency')
+plt.show()
+
+# AltitudeMeters Distribution
+sns.histplot(data['AltitudeMeters'], bins=30, kde=True)
+plt.title('AltitudeMeters Distribution')
+plt.xlabel('Altitude (m)')
+plt.ylabel('Frequency')
+plt.show()
+
+# Scatter plot of HeartRate vs Watts
+sns.scatterplot(data=data, x='HeartRate', y='Watts', alpha=0.5)
+plt.title('Scatter plot of HeartRate vs Watts')
+plt.xlabel('HeartRate (bpm)')
+plt.ylabel('Watts (w)')
+plt.show()
+
+# Correlation Heatmap
+correlation_matrix = data.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.show()
+```
+
+### Correlation Analysis
+
+Understanding correlations can provide insights into relationships between different metrics.
+
+```{python}
+correlation_matrix = data.corr()
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+plt.title('Correlation Heatmap')
+plt.show()
+```
+
+### Hypothesis Generation
+
+Based on the data understanding and initial visualizations:
+- There might be a positive correlation between heart rate and power output.
+- The altitude may impact the cadence and power output.
+
+### Data Grouping and Segmentation
+
+Segmentation based on altitude levels.
+
+```{python}
+low_altitude = data[data['AltitudeMeters'] < 1000]
+high_altitude = data[data['AltitudeMeters'] >= 1000]
+```
+
+### Identifying Outliers
+
+Outliers detection.
+
+```{python}
+sns.boxplot(data['Watts'])
+plt.title('Boxplot for Watts')
+plt.show()
+```
+
+### Tools and Software
+
+For EDA:
+- Python
+- Pandas
+- Matplotlib and Seaborn
+
+### Next Steps
+
+With insights from EDA, we proceed to more advanced analysis.
+
+## Naïve Bayes Classification
+
+### Introduction to Naive Bayes
+
+Naïve Bayes is a classification technique based on Bayes' theorem with the "naive" assumption of independence between features. Naïve Bayes classifiers work well in many real-world situations.
+
+```{python}
+from sklearn.naive_bayes import GaussianNB
+```
+
+### Data Preparation for Naïve Bayes
+
+Data splitting.
+
+```{python}
+from sklearn.model_selection import train_test_split
+
+# Features and target variable
+X = data[['HeartRate', 'Cadence', 'Watts', 'AltitudeMeters']]
+y = data['PowerOutputCategory']
+
+# Splitting the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+```
+
+### Feature Selection
+
+#### Feature Selection for Record Data
+
+For the cycling dataset.
+
+```{python}
+from sklearn.feature_selection import SelectKBest, f_classif
+
+# Using SelectKBest to select top features
+selector = SelectKBest(score_func=f_classif, k='all')
+selector.fit(X, y)
+
+# Getting the scores
+feature_scores = pd.DataFrame({
+    'Feature': X.columns,
+    'Score': selector.scores_
+}).sort_values(by='Score', ascending=False)
+
+feature_scores
+
+```
+
+### Naïve Bayes with Labeled Record Data
+
+Training Gaussian Naïve Bayes model.
+
+```{python}
+nb_model = GaussianNB()
+nb_model.fit(X_train, y_train)
+
+# Predictions
+y_pred = nb_model.predict(X_test)
+
+```
+
+Evaluation.
+
+```{python}
+from sklearn.metrics import classification_report
+
+print(classification_report(y_test, y_pred))
+```
+
+## Evaluation Metrics
+
+After applying the Naïve Bayes classifier on the test set, we have deduced the following evaluation metrics:
+
+- **Accuracy**: 91.62%
+- **Precision**: 91.78%
+- **Recall**: 91.62%
+- **F1-Score**: 91.67%
+
+## Conclusion:
+
+### 1. High Accuracy
+The model achieved an accuracy of 91.62% on the test set, showcasing its capability to make correct predictions for the majority of cases.
+
+### 2. High Precision and Recall
+Both precision and recall values exceeded 91%. This suggests that the model is not only adept at making accurate predictions for positive classes but also proficient in correctly identifying the majority of actual positive instances.
+
+### 3. High F1 Score
+The F1 score, which is the harmonic mean of precision and recall, is recorded at 91.67%. This metric underlines the model's balanced performance between precision and recall.
+
+In summary, the Naïve Bayes classifier demonstrates impressive performance on this dataset. However, for optimizing the model further:
+- Exploring more intricate models might be beneficial.
+- Engaging in additional feature engineering could refine the results.
+- Expanding the dataset can offer a broader understanding and accuracy.
+- Implementing cross-validation would provide a deeper insight into the model's stability and reliability.
+
+
+

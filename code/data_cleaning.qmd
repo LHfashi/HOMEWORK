@@ -1,0 +1,159 @@
+
+---
+title: "Data Cleaning for Cycling Power Training"
+output: html_document
+---
+
+
+This document aims to provide a comprehensive overview of the data cleaning process applied to our cycling power training dataset. We ensure transparency and reproducibility in every step of the process. 
+
+## Introduction
+
+Understanding and improving cycling power is essential for both enthusiasts and professional cyclists. This dataset contains recorded data related to cycling power. The cleaning process will help in refining this data for further analysis.
+
+## Loading the Raw Data
+
+```{python}
+import pandas as pd
+
+# Load the raw data
+cycle_data = pd.read_csv("cycledata.csv")
+cycle_data.head()
+```
+
+## Initial Data Inspection
+
+```{python}
+# Check the structure of the data
+cycle_data.info()
+
+# Check for missing values
+cycle_data.isnull().sum()
+```
+
+## Cleaning Steps
+
+### 1. Handling Missing Values
+
+```{python}
+# Load the dataset
+cycle_data = pd.read_csv("cycledata.csv")
+
+# Count missing values in each column
+missing_values_before = cycle_data.isnull().sum()
+
+# Using mean imputation for numeric columns.
+for col in cycle_data.select_dtypes(include=['float64', 'int64']).columns:
+    cycle_data[col].fillna(cycle_data[col].mean(), inplace=True)
+
+missing_values_after = cycle_data.isnull().sum()
+
+missing_values_before, missing_values_after
+```
+
+### 2. Incorrect Values
+```{python}
+# For this example, let's consider values beyond 3 standard deviations as outliers for the 'Watts' column.
+mean_watts = cycle_data['Watts'].mean()
+std_watts = cycle_data['Watts'].std()
+
+# Identifying outliers
+outliers = cycle_data[(cycle_data['Watts'] < mean_watts - 3*std_watts) | 
+                      (cycle_data['Watts'] > mean_watts + 3*std_watts)]
+
+# Replacing outliers with the mean
+cycle_data['Watts'].where(~cycle_data.index.isin(outliers.index), mean_watts, inplace=True)
+
+outliers
+```
+
+### 3. Feature Engineering
+
+```{python}
+# Let's create a feature that bins the 'Watts' column into 'Low', 'Medium', and 'High' power output.
+
+bins = [0, 150, 300, cycle_data['Watts'].max()]
+labels = ['Low', 'Medium', 'High']
+cycle_data['PowerOutput'] = pd.cut(cycle_data['Watts'], bins=bins, labels=labels, include_lowest=True)
+
+cycle_data['PowerOutput'].value_counts()
+
+```
+
+
+## Data Visualization: Before & After Cleaning
+
+### Visualization Before Cleaning
+
+```{python}
+import pandas as pd
+import matplotlib.pyplot as plt 
+import seaborn as sns
+
+# Load the original data
+original_data = pd.read_csv("cycledata.csv")
+
+# Setting the style for seaborn plots
+sns.set_style("whitegrid")
+
+# Create a figure with subplots
+fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(14, 18))
+
+# 1. Power output over time
+sns.lineplot(x=original_data['Index'], y=original_data['Watts'], ax=ax[0], color='blue')
+ax[0].set_title('Power Output Over Time (Before Cleaning)')
+ax[0].set_xlabel('Index')
+ax[0].set_ylabel('Power Output (Watts)')
+
+# 2. Histogram of Power
+sns.histplot(original_data['Watts'], bins=30, ax=ax[1], color='green')
+ax[1].set_title('Distribution of Power Output (Before Cleaning)')
+ax[1].set_xlabel('Power Output (Watts)')
+ax[1].set_ylabel('Frequency')
+
+# 3. Scatter plot of Heart Rate vs Power Output
+sns.scatterplot(x=original_data['HeartRate'], y=original_data['Watts'], ax=ax[2], color='red', alpha=0.6)
+ax[2].set_title('Heart Rate vs Power Output (Before Cleaning)')
+ax[2].set_xlabel('Heart Rate (bpm)')
+ax[2].set_ylabel('Power Output (Watts)')
+
+plt.tight_layout()
+plt.show()
+```
+
+Visualization After Cleaning
+```{python}
+# Create a figure with subplots for the cleaned data
+fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(14, 18))
+
+# 1. Power output over time
+sns.lineplot(x=cycle_data['Index'], y=cycle_data['Watts'], ax=ax[0], color='blue')
+ax[0].set_title('Power Output Over Time (After Cleaning)')
+ax[0].set_xlabel('Index')
+ax[0].set_ylabel('Power Output (Watts)')
+
+# 2. Histogram of Power
+sns.histplot(cycle_data['Watts'], bins=30, ax=ax[1], color='green')
+ax[1].set_title('Distribution of Power Output (After Cleaning)')
+ax[1].set_xlabel('Power Output (Watts)')
+ax[1].set_ylabel('Frequency')
+
+# 3. Scatter plot of Heart Rate vs Power Output
+sns.scatterplot(x=cycle_data['HeartRate'], y=cycle_data['Watts'], ax=ax[2], color='red', alpha=0.6)
+ax[2].set_title('Heart Rate vs Power Output (After Cleaning)')
+ax[2].set_xlabel('Heart Rate (bpm)')
+ax[2].set_ylabel('Power Output (Watts)')
+
+plt.tight_layout()
+plt.show()
+```
+
+
+## Conclusion
+
+The cycling power training dataset has been cleaned and is now ready for further analysis. All cleaning steps have been documented to ensure transparency and reproducibility.
+
+## Links
+
+- [Raw Data](cycledata.csv)
+- [Cleaned Data](cleaned_with_user_code_cycledata.csv)

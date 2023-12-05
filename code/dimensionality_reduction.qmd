@@ -1,0 +1,111 @@
+---
+title: "Dimensionality Reduction Analysis in Cycling Power Training"
+---
+
+## Introduction to Dimensionality Reduction in Cycling Power Training
+
+Dimensionality reduction plays a crucial role in simplifying complex, multi-dimensional data, making it easier to analyze and visualize. In the realm of cycling power training, where vast amounts of data are collected from sensors and trackers, reducing dimensionality can help in uncovering hidden patterns and relationships that might not be immediately apparent.
+
+This section of the project focuses on implementing and comparing two popular dimensionality reduction techniques: Principal Component Analysis (PCA) and t-SNE (t-Distributed Stochastic Neighbor Embedding). PCA, a linear technique, is known for its effectiveness in reducing feature spaces while maintaining the variance in the data. On the other hand, t-SNE, a non-linear approach, excels in handling complex multimodal data, which makes it particularly interesting for our cycling dataset that encompasses diverse metrics like heart rate, cadence, and power output.
+
+By applying these techniques to the cycling power training data, we aim to achieve a more intuitive understanding of the data structure. This will not only aid in better visualization but also potentially reveal insights into the factors that most significantly impact cycling performance.
+
+In the following sections, we delve into the technicalities of applying PCA and t-SNE to our dataset, explore various parameters and their impacts, and visualize the results. Through this comparative analysis, we endeavor to determine which technique is more suitable for our specific dataset and analysis objectives.
+
+## Dimensionality Reduction with PCA
+
+Principal Component Analysis (PCA) is a widely used technique for reducing the dimensionality of large datasets. By transforming the data into a new set of variables, PCA provides a way to focus on the most important features.
+
+
+## Determine the number of principal components
+
+```{python}
+import os
+import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+# Load the dataset
+data = pd.read_csv("cleaned_with_user_code_cycledata.csv")
+
+# Dropping non-numeric and non-relevant columns
+data_numeric = data.drop(['Index', 'Time', 'PowerOutputCategory', 'PowerOutput'], axis=1)
+
+# Standardize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(data_numeric)
+
+# Applying PCA to determine the optimal number of components
+pca_full = PCA()
+pca_full.fit(X_scaled)
+
+# Plotting the cumulative explained variance
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, len(pca_full.explained_variance_ratio_) + 1), pca_full.explained_variance_ratio_.cumsum(), marker='o', linestyle='--')
+plt.title('Explained Variance by Components')
+plt.xlabel('Number of Components')
+plt.ylabel('Cumulative Explained Variance')
+plt.show()
+```
+
+### Applying PCA to the Cycling Power Training Dataset
+
+```{python}
+# Applying PCA
+pca = PCA(n_components=2)
+principalComponents = pca.fit_transform(X_scaled)
+
+# Visualizing PCA Results
+plt.scatter(principalComponents[:,0], principalComponents[:,1])
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.title('PCA of Cycling Power Training Data')
+plt.show()
+```
+
+### Brief analysis of PCA results
+
+After applying PCA, we observed that the first few components account for the majority of the variance in the dataset. This suggests that these components capture the most significant patterns and relationships in the data.
+
+By reducing the dimensionality to these principal components, we can simplify our data analysis while still retaining the most important features of the cycling power training data. This reduction can help in visualizing complex data and identifying key factors influencing cycling performance.
+
+### Visualizing PCA Results
+
+The visualization of PCA results can provide insights into the inherent clustering or patterns within the dataset. The scatter plot below shows the distribution of the cycling power training data in the transformed principal component space.
+
+## Dimensionality Reduction with t-SNE
+
+t-Distributed Stochastic Neighbor Embedding (t-SNE) is a powerful non-linear technique used for dimensionality reduction and visualization of complex datasets.
+
+### Implementing t-SNE on the Cycling Dataset
+
+```{python}
+from sklearn.manifold import TSNE
+
+# Apply t-SNE to the same standardized dataset used for PCA
+# Experiment with different perplexity values
+for perplexity in [30, 50, 100]:
+    tsne = TSNE(n_components=2, perplexity=perplexity, n_iter=300)
+    tsne_results = tsne.fit_transform(X_scaled)
+
+    plt.scatter(tsne_results[:,0], tsne_results[:,1])
+    plt.title(f't-SNE with Perplexity {perplexity}')
+    plt.xlabel('t-SNE Feature 1')
+    plt.ylabel('t-SNE Feature 2')
+    plt.show()
+```
+
+### t-SNE perplexity exploration and PCA comparison with t-SNE
+
+In our analysis, both PCA and t-SNE reveal distinct patterns in the cycling power training data. PCA, being a linear technique, is effective in capturing global structure and variance in the data. However, t-SNE, a non-linear technique, excels in uncovering local patterns and clusters that are not apparent in PCA.
+
+t-SNE's ability to reveal intricate structures at different perplexity levels provides valuable insights into the data's complexity. While PCA gives a broad overview, t-SNE offers a deeper dive into the relationships between data points.
+
+The choice between PCA and t-SNE depends on the specific analytical goals. PCA is suitable for understanding overall variance and relationships among features, whereas t-SNE is more apt for identifying clusters and local patterns in the data.
+
+
+### Evaluating and Comparing PCA and t-SNE
+
+In evaluating the effectiveness of PCA and t-SNE, we consider how well each technique preserves the structure and information of the data. The comparison of visualizations produced by each method offers insights into their respective strengths and weaknesses in revealing the underlying structure of the cycling power training data.
+

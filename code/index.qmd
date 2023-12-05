@@ -1,0 +1,47 @@
+---
+title: "Cycling Power Training"
+---
+## Authored By
+**Yuang Huang**  
+ID: yh834
+Georgetowm University
+
+<div style="background-color: #0077B6; color: white; padding: 20px; border-radius: 10px;">
+
+## Cycling Power Training
+
+A scientifically preferred method for optimizing cycling performance.
+
+</div>
+
+<div style="background-color: #FFFFFF; margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #e0e0e0;">
+
+### Why Power Training?
+
+Power training offers a direct measurement of a cyclist's effort, providing an objective metric that can guide and adjust training in real-time.
+
+</div>
+
+<div style="background-color: #FFFFFF; margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #e0e0e0;">
+
+### Benefits of Power Training
+
+- Immediate and objective measurement of training intensity.
+- Allows for personalized and targeted training adjustments.
+- Provides real-time feedback to optimize performance.
+
+</div>
+
+<div style="margin-top: 20px; background-color: #0077B6; color: white; padding: 10px; text-align: center; border-radius: 10px;">
+
+Join us on this journey to achieve peak cycling performance through the power of data!
+
+</div>
+
+## Code
+
+For those interested in delving into the technical intricacies of my work, my entire project codebase is accessible on GitHub.
+
+[![Access My GitHub Code](https://img.shields.io/badge/View%20Code-GitHub-green)](https://github.com/anly501/dsan-5000-project-LHfashi)
+
+

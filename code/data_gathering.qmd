@@ -1,0 +1,92 @@
+---
+title: "Data Collection for Cycling Power Training"
+---
+Cycling power training has become a pivotal aspect of modern competitive cycling, offering real-time insights that can significantly impact an athlete's performance and training regimen. For a comprehensive analysis of this domain, gathering robust and reliable data is paramount.
+
+## Data Sources
+
+### Commercial Power Meters
+Brands like Garmin, Quarq, and Stages provide power meters that can be mounted on bikes. These devices measure torque and crank velocity to calculate power output in watts. Most modern power meters come with Bluetooth or ANT+ compatibility, allowing for real-time data transmission to cycling computers or smartphones.
+
+![Commercial Power Meter](powermeter.png)
+
+### Dedicated Cycling Platforms
+
+- **Strava**: A social network for athletes, Strava provides an extensive dataset for individual rides, including power output, cadence, speed, elevation, and more. [Explore Strava](https://www.strava.com/)
+  
+- **TrainingPeaks**: A platform used by many coaches and athletes, TrainingPeaks allows for detailed analysis of power data, often correlating it with other metrics such as heart rate, speed, and perceived exertion. [Explore TrainingPeaks](https://www.trainingpeaks.com/)
+  
+- **Zwift**: An online platform blending the virtual gaming world with real-world cycling, where cyclists can train and race in a variety of virtual scenarios. Power data from Zwift sessions is extensively detailed and can be exported for further analysis. [Explore Zwift](https://www.zwift.com/)
+
+### Academic Publications
+
+Below are three professional papers related to cycling power training, presenting a substantial amount of data:
+
+1. **Training Characteristics and Power Profiles of USA Cycling Road Cyclists**:
+   - This study documented data from 2019, including power meter data displayed on Strava® with peak power data (5-s, 1-min, 5-min, 20-min, and 1-h). A total of 92 amateur racers (67 men, 25 women) completed this part of the study, where annual training metrics, power data, and survey results were compared.
+   - [Read more](https://trace.tennessee.edu/cgi/viewcontent.cgi?article=7252&context=utk_gradthes)
+
+2. **Training Characteristics of Male and Female Professional Road Cyclists**:
+   - Week-by-week power meter training and racing data of 2 road cyclists (age: 29 and 23 y; maximum oxygen consumption: 83 and 81 mL·min −1 ·kg −1 ; and relative 20-min record were analyzed in this study.
+   - [Read more](https://www.researchgate.net/publication/333440524_Training_Characteristics_of_Male_and_Female_Professional_Road_Cyclists)
+
+3. **A Giant Study on Power Records in 144 Professional Cyclists**:
+   - Valenzuela and colleagues published the greatest collection of power data from professional cyclists to date, exploring the power records of male professional cyclists.
+   - [Read more](https://www.wattkg.com/a-giant-study-on-power-records-in-144-professional-cyclists/)
+
+### Cycling Forums and Communities
+
+Platforms like the [TrainerRoad forum](https://www.trainerroad.com/forum/) or the Reddit [r/Velo community](https://www.reddit.com/r/Velo/) often have threads where enthusiasts and experts discuss power training. Occasionally, members share their datasets for communal insights or queries.
+
+## Data Collection Methods
+
+Data is collected using various methods including:
+
+- **APIs**: Utilizing APIs of platforms to gather cycling-related data. The collected data comprises various formats like JSON, CSV, and XML, which will later be cleaned and analyzed to derive insights into cycling power training.
+
+    - **Strava API**:
+        - **Description**: The Strava API provides access to a rich dataset of individual rides, including metrics like power output, cadence, speed, elevation, and more. This data is crucial for analyzing cycling performance and understanding the impact of different variables on training outcomes.
+        - **Access**: Access to the Strava API requires creating a Strava account, setting up a new application in the Strava developer settings, and obtaining an access token for authentication. This process is detailed in the [Strava API documentation](https://developers.strava.com/docs/getting-started).
+        - **Python API Code**: [Link to GitHub repository with Python API scripts for Strava](https://github.com/LHfashi/HOMEWORK)
+
+- **Manual Downloads**:
+    - **Description**: Some datasets are available for direct download from academic publications, forums, or other online sources. These datasets, often in CSV format, provide historical data that can be used for trend analysis and comparative studies.
+    - **Example Dataset**: [Link to dataset](https://medium.com/@hbuhrmann/creating-a-strava-style-power-curve-from-cycling-data-using-python-256147a1763f)
+
+
+## Data Preview
+
+Below are previews of the data collected from various sources. These previews provide insights into the structure and type of data collected.
+
+```{python, echo=FALSE}
+import pandas as pd
+import matplotlib.pyplot as plt 
+import seaborn as sns
+data = pd.read_csv("cycledata.csv")
+
+# Setting the style for seaborn plots
+sns.set_style("whitegrid")
+
+# Create a figure with subplots
+fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(14, 18))
+
+# 1. Power output over time
+sns.lineplot(x=data['Index'], y=data['Watts'], ax=ax[0], color='blue')
+ax[0].set_title('Power Output Over Time')
+ax[0].set_xlabel('Index')
+ax[0].set_ylabel('Power Output (Watts)')
+
+# 2. Histogram of Power (assuming Watts represents speed)
+sns.histplot(data['Watts'], bins=30, ax=ax[1], color='green')
+ax[1].set_title('Distribution of Power Output')
+ax[1].set_xlabel('Power Output (Watts)')
+ax[1].set_ylabel('Frequency')
+
+# 3. Scatter plot of Heart Rate vs Power Output
+sns.scatterplot(x=data['HeartRate'], y=data['Watts'], ax=ax[2], color='red', alpha=0.6)
+ax[2].set_title('Heart Rate vs Power Output')
+ax[2].set_xlabel('Heart Rate (bpm)')
+ax[2].set_ylabel('Power Output (Watts)')
+
+plt.show()
+```

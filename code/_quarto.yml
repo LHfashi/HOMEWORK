@@ -1,0 +1,38 @@
+project:
+  type: website
+
+website:
+  title: "Cycling Power Training"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: code.qmd
+        text: Code
+      - href: data.qmd
+        text: Data
+      - href: introduction.qmd
+        text: Introduction
+      - href: data_gathering.qmd
+        text: Data Gathering
+      - href: data_cleaning.qmd
+        text: Data Cleaning
+      - href: data_exploration.qmd
+        text: Data Exploration
+      - href: naive_bayes.qmd
+        text: Naive Bayes
+      - href: clustering.qmd
+        text: Clustering
+      - href: dimensionality_reduction.qmd
+        text: Dimensionality Reduction
+      - href: decision_trees.qmd
+        text: Decision Trees
+      - href: conclusions.qmd
+        text: Conclusions
+
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
